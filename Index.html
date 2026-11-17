@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IMMUNE PUZZLE</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #eef4ff;
+  text-align: center;
+  padding: 15px;
+}
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+}
+h1 { color: #315b9b; }
+button {
+  padding: 10px 15px;
+  margin: 5px;
+  border: none;
+  border-radius: 8px;
+  background: #477bd1;
+  color: white;
+  font-size: 15px;
+}
+.piece {
+  background: #e3edff;
+  color: #222;
+  padding: 12px;
+  margin: 7px;
+  border-radius: 8px;
+}
+.info {
+  background: #f1f5fa;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+input {
+  padding: 10px;
+  border: 1px solid #aaa;
+  border-radius: 7px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>🧬 IMMUNE PUZZLE</h1>
+<p>퍼즐을 맞추며 인체의 면역 과정을 알아보자!</p>
+
+<div id="start">
+  <input id="name" placeholder="이름 입력">
+  <br>
+  <button onclick="startGame()">게임 시작</button>
+  <button onclick="showRank()">순위 보기</button>
+  <button onclick="showStudy()">학습 자료</button>
+</div>
+
+<div id="game" style="display:none">
+  <h2 id="stage"></h2>
+  <p id="desc"></p>
+  <div id="pieces"></div>
+  <button onclick="check()">정답 확인</button>
+  <button onclick="goHome()">메인으로</button>
+  <p id="result"></p>
+</div>
+
+<div id="study" style="display:none">
+  <h2>면역 학습 자료</h2>
+  <div class="info">
+  <b>체액성 면역</b><br>
+  B세포가 형질세포로 분화하고 형질세포가 항체를 생산한다.
+  항체는 항원에 결합하여 병원체를 중화하는 등 면역 작용을 돕는다.
+  </div>
+  <div class="info">
+  <b>세포성 면역</b><br>
+  세포독성 T세포가 감염된 세포를 인식하고 제거한다.
+  </div>
+  <div class="info">
+  <b>주요 면역세포</b><br>
+  대식세포: 병원체 포식 및 항원 제시<br>
+  보조 T세포: 면역세포 활성화 도움<br>
+  B세포: 항체를 만드는 형질세포로 분화<br>
+  형질세포: 항체 생산<br>
+  기억세포: 재침입 시 빠른 면역 반응<br>
+  세포독성 T세포: 감염된 세포 제거
+  </div>
+  <button onclick="goHome()">돌아가기</button>
+</div>
+
+<div id="rank" style="display:none">
+  <h2>🏆 전체 순위</h2>
+  <div id="rankList"></div>
+  <button onclick="resetRank()">기록 초기화</button>
+  <button onclick="goHome()">돌아가기</button>
+</div>
+</div>
+
+<script>
+let player = "";
+let score = 0;
+let stageIndex = 0;
+let mistakes = 0;
+
+const stages = [
+{
+ title: "STAGE 1. 체액성 면역",
+ desc: "체액성 면역의 진행 순서를 맞춰보세요.",
+ steps: [
+ "병원체 침입",
+ "대식세포의 항원 제시",
+ "보조 T세포 활성화",
+ "B세포 활성화",
+ "B세포의 형질세포 분화",
+ "형질세포의 항체 생산"
+ ],
+ explanation: "체액성 면역은 B세포가 형질세포로 분화하여 항체를 생산하는 면역 반응이다."
+},
+{
+ title: "STAGE 2. 세포성 면역",
+ desc: "세포성 면역의 진행 순서를 맞춰보세요.",
+ steps: [
+ "바이러스의 세포 감염",
+ "감염된 세포의 항원 제시",
+ "세포독성 T세포의 항원 인식",
+ "세포독성 T세포 활성화",
+ "감염된 세포 제거"
+ ],
+ explanation: "세포성 면역은 세포독성 T세포가 감염된 세포를 인식하고 제거하는 면역 반응이다."
+}
+];
+
+let current = [];
+let startTime;
+
+function hideAll() {
+ document.getElementById("start").style.display="none";
+ document.getElementById("game").style.display="none";
+ document.getElementById("study").style.display="none";
+ document.getElementById("rank").style.display="none";
+}
+
+function goHome() {
+ hideAll();
+ document.getElementById("start").style.display="block";
+}
+
+function startGame() {
+ player = document.getElementById("name").value.trim();
+ if(!player) {
+   alert("이름을 입력하세요!");
+   return;
+ }
+ score = 0;
+ mistakes = 0;
+ stageIndex = 0;
+ startTime = Date.now();
+ hideAll();
+ document.getElementById("game").style.display="block";
+ loadStage();
+}
+
+function loadStage() {
+ let s = stages[stageIndex];
+ document.getElementById("stage").innerText=s.title;
+ document.getElementById("desc").innerText=s.desc;
+ document.getElementById("result").innerText="";
+ current = [...s.steps].sort(()=>Math.random()-0.5);
+ draw();
+}
+
+function draw() {
+ let area=document.getElementById("pieces");
+ area.innerHTML="";
+ current.forEach((item,i)=>{
+  let div=document.createElement("div");
+  div.className="piece";
+  div.innerHTML=`
+   ${i+1}. ${item}
+   <button onclick="move(${i},-1)">▲</button>
+   <button onclick="move(${i},1)">▼</button>
+  `;
+  area.appendChild(div);
+ });
+}
+
+function move(i,d) {
+ let j=i+d;
+ if(j<0 || j>=current.length) return;
+ [current[i],current[j]]=[current[j],current[i]];
+ draw();
+}
+
+function check() {
+ let correct=stages[stageIndex].steps;
+ let result=document.getElementById("result");
+
+ if(current.every((v,i)=>v===correct[i])) {
+   let points = mistakes===0 ? 100 : 70;
+   score += points;
+   result.innerHTML="🎉 정답입니다! +"+points+"점<br>"+stages[stageIndex].explanation;
+   setTimeout(()=>{
+    stageIndex++;
+    if(stageIndex<stages.length) {
+      loadStage();
+    } else {
+      finish();
+    }
+   },2500);
+ } else {
+   mistakes++;
+   result.innerText="아직 순서가 틀렸어요. 다시 맞춰보세요!";
+ }
+}
+
+function finish() {
+ let time=Math.floor((Date.now()-startTime)/1000);
+ let bonus=Math.max(0,Math.max(0,60-time));
+ score += bonus;
+
+ let records=JSON.parse(localStorage.getItem("immuneRank")||"[]");
+ records.push({name:player,score:score,time:time});
+ records.sort((a,b)=>b.score-a.score || a.time-b.time);
+ localStorage.setItem("immuneRank",JSON.stringify(records));
+
+ alert("게임 완료! 최종 점수: "+score+"점");
+ showRank();
+}
+
+function showRank() {
+ hideAll();
+ document.getElementById("rank").style.display="block";
+ let records=JSON.parse(localStorage.getItem("immuneRank")||"[]");
+ document.getElementById("rankList").innerHTML=
+ records.length ?
+ records.map((r,i)=>`${i+1}위. ${r.name} - ${r.score}점 (${r.time}초)`).join("<hr>") :
+ "아직 기록이 없습니다.";
+}
+
+function showStudy() {
+ hideAll();
+ document.getElementById("study").style.display="block";
+}
+
+function resetRank() {
+ if(confirm("모든 기록을 삭제할까요?")) {
+  localStorage.removeItem("immuneRank");
+  showRank();
+ }
+}
+</script>
+
+</body>
+</html>
