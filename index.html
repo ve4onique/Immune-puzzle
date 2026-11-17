@@ -7,111 +7,113 @@
 <style>
 body {
   font-family: Arial, sans-serif;
-  background: #eef4ff;
-  text-align: center;
-  padding: 15px;
+  background: #f4f4f4;
+  color: #222;
+  margin: 0;
+  padding: 20px;
 }
-.container {
+main {
   max-width: 600px;
   margin: auto;
   background: white;
-  padding: 20px;
-  border-radius: 15px;
+  padding: 22px;
+  border: 1px solid #ddd;
 }
-h1 { color: #315b9b; }
+h1 { font-size: 25px; }
 button {
-  padding: 10px 15px;
-  margin: 5px;
-  border: none;
-  border-radius: 8px;
-  background: #477bd1;
-  color: white;
-  font-size: 15px;
+  padding: 9px 14px;
+  margin: 4px;
+  background: #e5e5e5;
+  border: 1px solid #bbb;
+  color: #222;
+  cursor: pointer;
+}
+button:hover { background: #d5d5d5; }
+input {
+  padding: 9px;
+  border: 1px solid #aaa;
 }
 .piece {
-  background: #e3edff;
-  color: #222;
-  padding: 12px;
-  margin: 7px;
-  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f1f1f1;
+  padding: 9px;
+  margin: 6px 0;
+  border: 1px solid #ddd;
 }
+.piece button { margin: 2px; }
 .info {
-  background: #f1f5fa;
+  background: #f5f5f5;
   padding: 12px;
-  border-radius: 8px;
   margin: 10px 0;
 }
-input {
-  padding: 10px;
-  border: 1px solid #aaa;
-  border-radius: 7px;
+#timer {
+  font-size: 20px;
+  font-weight: bold;
 }
 </style>
 </head>
+
 <body>
+<main>
+<h1>IMMUNE PUZZLE</h1>
+<p>세포성 면역과 체액성 면역의 과정을 순서대로 배열하세요.</p>
 
-<div class="container">
-<h1>🧬 IMMUNE PUZZLE</h1>
-<p>퍼즐을 맞추며 인체의 면역 과정을 알아보자!</p>
-
-<div id="start">
+<div id="home">
   <input id="name" placeholder="이름 입력">
-  <br>
   <button onclick="startGame()">게임 시작</button>
-  <button onclick="showRank()">순위 보기</button>
-  <button onclick="showStudy()">학습 자료</button>
+  <button onclick="study()">학습 자료</button>
+  <p id="best"></p>
 </div>
 
-<div id="game" style="display:none">
+<div id="game" hidden>
   <h2 id="stage"></h2>
-  <p id="desc"></p>
+  <p id="description"></p>
+  <p>완성 시간: <span id="timer">0</span>초</p>
   <div id="pieces"></div>
-  <button onclick="check()">정답 확인</button>
-  <button onclick="goHome()">메인으로</button>
+  <button onclick="checkAnswer()">정답 확인</button>
   <p id="result"></p>
 </div>
 
-<div id="study" style="display:none">
-  <h2>면역 학습 자료</h2>
+<div id="study" hidden>
+  <h2>학습 자료</h2>
   <div class="info">
-  <b>체액성 면역</b><br>
-  B세포가 형질세포로 분화하고 형질세포가 항체를 생산한다.
-  항체는 항원에 결합하여 병원체를 중화하는 등 면역 작용을 돕는다.
+    <b>체액성 면역</b>
+    <p>B세포가 형질세포로 분화하고 형질세포가 항체를 생산한다. 항체는 항원에 결합하여 병원체를 중화하는 등 면역 작용을 돕는다.</p>
   </div>
   <div class="info">
-  <b>세포성 면역</b><br>
-  세포독성 T세포가 감염된 세포를 인식하고 제거한다.
+    <b>세포성 면역</b>
+    <p>세포독성 T세포가 감염된 세포를 인식하고 제거하는 면역 반응이다.</p>
   </div>
   <div class="info">
-  <b>주요 면역세포</b><br>
-  대식세포: 병원체 포식 및 항원 제시<br>
-  보조 T세포: 면역세포 활성화 도움<br>
-  B세포: 항체를 만드는 형질세포로 분화<br>
-  형질세포: 항체 생산<br>
-  기억세포: 재침입 시 빠른 면역 반응<br>
-  세포독성 T세포: 감염된 세포 제거
+    <b>주요 면역세포</b>
+    <p>
+    대식세포: 병원체 포식 및 항원 제시<br>
+    보조 T세포: 면역세포 활성화 도움<br>
+    B세포: 형질세포로 분화<br>
+    형질세포: 항체 생산<br>
+    기억세포: 재침입 시 빠른 면역 반응<br>
+    세포독성 T세포: 감염된 세포 제거
+    </p>
   </div>
-  <button onclick="goHome()">돌아가기</button>
+  <button onclick="home()">돌아가기</button>
 </div>
 
-<div id="rank" style="display:none">
-  <h2>🏆 전체 순위</h2>
-  <div id="rankList"></div>
-  <button onclick="resetRank()">기록 초기화</button>
-  <button onclick="goHome()">돌아가기</button>
+<div id="end" hidden>
+  <h2>게임 결과</h2>
+  <p id="finalScore"></p>
+  <p id="finalTime"></p>
+  <p id="bestResult"></p>
+  <button onclick="home()">메인으로</button>
 </div>
-</div>
+</main>
 
 <script>
-let player = "";
-let score = 0;
-let stageIndex = 0;
-let mistakes = 0;
-
 const stages = [
 {
- title: "STAGE 1. 체액성 면역",
- desc: "체액성 면역의 진행 순서를 맞춰보세요.",
+ title: "체액성 면역",
+ description: "체액성 면역의 진행 순서를 배열하세요.",
  steps: [
  "병원체 침입",
  "대식세포의 항원 제시",
@@ -120,72 +122,105 @@ const stages = [
  "B세포의 형질세포 분화",
  "형질세포의 항체 생산"
  ],
- explanation: "체액성 면역은 B세포가 형질세포로 분화하여 항체를 생산하는 면역 반응이다."
+ explanation: "체액성 면역은 B세포가 형질세포로 분화하여 항체를 생산하는 면역 반응입니다."
 },
 {
- title: "STAGE 2. 세포성 면역",
- desc: "세포성 면역의 진행 순서를 맞춰보세요.",
+ title: "세포성 면역",
+ description: "세포성 면역의 진행 순서를 배열하세요.",
  steps: [
  "바이러스의 세포 감염",
  "감염된 세포의 항원 제시",
  "세포독성 T세포의 항원 인식",
- "세포독성 T세포 활성화",
+ "세포독성 T세포의 활성화",
  "감염된 세포 제거"
  ],
- explanation: "세포성 면역은 세포독성 T세포가 감염된 세포를 인식하고 제거하는 면역 반응이다."
+ explanation: "세포성 면역은 세포독성 T세포가 감염된 세포를 인식하고 제거하는 면역 반응입니다."
 }
 ];
 
+let player = "";
+let stageIndex = 0;
+let score = 0;
+let mistakes = 0;
 let current = [];
-let startTime;
+let seconds = 0;
+let timerInterval;
 
 function hideAll() {
- document.getElementById("start").style.display="none";
- document.getElementById("game").style.display="none";
- document.getElementById("study").style.display="none";
- document.getElementById("rank").style.display="none";
+ ["home","game","study","end"].forEach(id=>{
+  document.getElementById(id).hidden = true;
+ });
 }
 
-function goHome() {
+function home() {
+ clearInterval(timerInterval);
  hideAll();
- document.getElementById("start").style.display="block";
+ document.getElementById("home").hidden = false;
+ showBest();
+}
+
+function showBest() {
+ let best = localStorage.getItem("best_" + player);
+ document.getElementById("best").innerText =
+ player && best ? "내 최고 점수: " + best + "점" : "";
 }
 
 function startGame() {
  player = document.getElementById("name").value.trim();
  if(!player) {
-   alert("이름을 입력하세요!");
-   return;
+  alert("이름을 입력하세요.");
+  return;
  }
+ stageIndex = 0;
  score = 0;
  mistakes = 0;
- stageIndex = 0;
- startTime = Date.now();
+ seconds = 0;
  hideAll();
- document.getElementById("game").style.display="block";
+ document.getElementById("game").hidden = false;
+ startTimer();
  loadStage();
+}
+
+function startTimer() {
+ clearInterval(timerInterval);
+ seconds = 0;
+ document.getElementById("timer").innerText = seconds;
+ timerInterval = setInterval(()=>{
+  seconds++;
+  document.getElementById("timer").innerText = seconds;
+ },1000);
 }
 
 function loadStage() {
  let s = stages[stageIndex];
- document.getElementById("stage").innerText=s.title;
- document.getElementById("desc").innerText=s.desc;
- document.getElementById("result").innerText="";
- current = [...s.steps].sort(()=>Math.random()-0.5);
+ document.getElementById("stage").innerText =
+ "STAGE " + (stageIndex+1) + ". " + s.title;
+ document.getElementById("description").innerText = s.description;
+ document.getElementById("result").innerText = "";
+ current = [...s.steps];
+ do {
+  current.sort(()=>Math.random()-0.5);
+ } while(current.every((v,i)=>v===s.steps[i]));
  draw();
 }
 
 function draw() {
- let area=document.getElementById("pieces");
- area.innerHTML="";
+ let area = document.getElementById("pieces");
+ area.innerHTML = "";
  current.forEach((item,i)=>{
-  let div=document.createElement("div");
-  div.className="piece";
-  div.innerHTML=`
-   ${i+1}. ${item}
-   <button onclick="move(${i},-1)">▲</button>
-   <button onclick="move(${i},1)">▼</button>
-  `;
+  let div = document.createElement("div");
+  div.className = "piece";
+  let span = document.createElement("span");
+  span.innerText = (i+1)+". "+item;
+  let controls = document.createElement("span");
+  let up = document.createElement("button");
+  up.innerText = "↑";
+  up.onclick = ()=>move(i,-1);
+  let down = document.createElement("button");
+  down.innerText = "↓";
+  down.onclick = ()=>move(i,1);
+  controls.append(up,down);
+  div.append(span,controls);
   area.appendChild(div);
  });
 }
@@ -197,64 +232,56 @@ function move(i,d) {
  draw();
 }
 
-function check() {
- let correct=stages[stageIndex].steps;
- let result=document.getElementById("result");
+function checkAnswer() {
+ let correct = stages[stageIndex].steps;
+ let result = document.getElementById("result");
 
  if(current.every((v,i)=>v===correct[i])) {
-   let points = mistakes===0 ? 100 : 70;
-   score += points;
-   result.innerHTML="🎉 정답입니다! +"+points+"점<br>"+stages[stageIndex].explanation;
-   setTimeout(()=>{
-    stageIndex++;
-    if(stageIndex<stages.length) {
-      loadStage();
-    } else {
-      finish();
-    }
-   },2500);
+  let points = mistakes===0 ? 100 : 70;
+  score += points;
+  result.innerText = "정답입니다! +" + points + "점\n" +
+  stages[stageIndex].explanation;
+
+  document.querySelector("#game button").disabled = true;
+
+  setTimeout(()=>{
+   document.querySelector("#game button").disabled = false;
+   stageIndex++;
+   if(stageIndex<stages.length) {
+    loadStage();
+   } else {
+    finish();
+   }
+  },2000);
  } else {
-   mistakes++;
-   result.innerText="아직 순서가 틀렸어요. 다시 맞춰보세요!";
+  mistakes++;
+  result.innerText = "순서가 틀렸습니다. 다시 배열해 보세요.";
  }
 }
 
 function finish() {
- let time=Math.floor((Date.now()-startTime)/1000);
- let bonus=Math.max(0,Math.max(0,60-time));
- score += bonus;
+ clearInterval(timerInterval);
+ let bestKey = "best_" + player;
+ let oldBest = Number(localStorage.getItem(bestKey) || 0);
 
- let records=JSON.parse(localStorage.getItem("immuneRank")||"[]");
- records.push({name:player,score:score,time:time});
- records.sort((a,b)=>b.score-a.score || a.time-b.time);
- localStorage.setItem("immuneRank",JSON.stringify(records));
-
- alert("게임 완료! 최종 점수: "+score+"점");
- showRank();
-}
-
-function showRank() {
- hideAll();
- document.getElementById("rank").style.display="block";
- let records=JSON.parse(localStorage.getItem("immuneRank")||"[]");
- document.getElementById("rankList").innerHTML=
- records.length ?
- records.map((r,i)=>`${i+1}위. ${r.name} - ${r.score}점 (${r.time}초)`).join("<hr>") :
- "아직 기록이 없습니다.";
-}
-
-function showStudy() {
- hideAll();
- document.getElementById("study").style.display="block";
-}
-
-function resetRank() {
- if(confirm("모든 기록을 삭제할까요?")) {
-  localStorage.removeItem("immuneRank");
-  showRank();
+ if(score>oldBest) {
+  localStorage.setItem(bestKey,score);
+  oldBest=score;
  }
-}
-</script>
 
+ hideAll();
+ document.getElementById("end").hidden = false;
+ document.getElementById("finalScore").innerText = "최종 점수: " + score + "점";
+ document.getElementById("finalTime").innerText = "완성 시간: " + seconds + "초";
+ document.getElementById("bestResult").innerText = "내 최고 점수: " + oldBest + "점";
+}
+
+function study() {
+ hideAll();
+ document.getElementById("study").hidden = false;
+}
+
+showBest();
+</script>
 </body>
 </html>
