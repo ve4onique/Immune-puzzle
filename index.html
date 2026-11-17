@@ -1,117 +1,329 @@
-\<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IMMUNE PUZZLE</title>
 
-\<html lang="ko">
-\<head>
-\<meta charset="UTF-8">
-\<meta name="viewport" content="width=device-width, initial-scale=1">
-\<title>IMMUNE PUZZLE\</title>
-\<style>
+<style>
 body {
-&#x20; font-family: Arial, sans-serif;
-&#x20; background: #f4f4f4;
-&#x20; color: #222;
-&#x20; margin: 0;
-&#x20; padding: 20px;
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  color: #222;
+  margin: 0;
+  padding: 20px;
 }
 main {
-&#x20; max-width: 600px;
-&#x20; margin: auto;
-&#x20; background: white;
-&#x20; padding: 22px;
-&#x20; border: 1px solid #ddd;
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 22px;
+  border: 1px solid #ddd;
 }
 h1 { font-size: 25px; }
 button {
-&#x20; padding: 9px 14px;
-&#x20; margin: 4px;
-&#x20; background: #e5e5e5;
-&#x20; border: 1px solid #bbb;
-&#x20; color: #222;
-&#x20; cursor: pointer;
+  padding: 9px 14px;
+  margin: 4px;
+  background: #e5e5e5;
+  border: 1px solid #bbb;
+  color: #222;
+  cursor: pointer;
 }
-button\:hover { background: #d5d5d5; }
-button\:disabled {
-&#x20; cursor: default;
-&#x20; opacity: 0.5;
-}
+button:hover { background: #d5d5d5; }
+button:disabled { opacity: 0.5; }
 input {
-&#x20; padding: 9px;
-&#x20; border: 1px solid #aaa;
+  padding: 9px;
+  border: 1px solid #aaa;
 }
 .piece {
-&#x20; display: flex;
-&#x20; justify-content: space-between;
-&#x20; align-items: center;
-&#x20; background: #f1f1f1;
-&#x20; padding: 9px;
-&#x20; margin: 6px 0;
-&#x20; border: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f1f1f1;
+  padding: 9px;
+  margin: 6px 0;
+  border: 1px solid #ddd;
 }
 .piece button { margin: 2px; }
 .info {
-&#x20; background: #f5f5f5;
-&#x20; padding: 12px;
-&#x20; margin: 10px 0;
+  background: #f5f5f5;
+  padding: 12px;
+  margin: 10px 0;
 }
-\#timer {
-&#x20; font-size: 20px;
-&#x20; font-weight: bold;
+#timer {
+  font-size: 20px;
+  font-weight: bold;
 }
-\</style>
-\</head>
+</style>
+</head>
 
-\<body>
-\<main>
-\<h1>IMMUNE PUZZLE\</h1>
-\<p>세포성 면역과 체액성 면역의 과정을 순서대로 배열하세요.\</p>
+<body>
+<main>
+<h1>IMMUNE PUZZLE</h1>
+<p>세포성 면역과 체액성 면역의 과정을 순서대로 배열하세요.</p>
 
-\<div id="home">
-&#x20; \<input id="name" placeholder="이름 입력">
-&#x20; \<button onclick="startGame()">게임 시작\</button>
-&#x20; \<button onclick="study()">학습 자료\</button>
-&#x20; \<p id="best">\</p>
-\</div>
+<div id="home">
+  <input id="name" placeholder="이름 입력" oninput="showBest()">
+  <button onclick="startGame()">게임 시작</button>
+  <button onclick="study()">학습 자료</button>
+  <p id="best"></p>
+</div>
 
-\<div id="game" hidden>
-&#x20; \<h2 id="stage">\</h2>
-&#x20; \<p id="description">\</p>
-&#x20; \<p>완성 시간: \<span id="timer">0.00\</span>초\</p>
-&#x20; \<div id="pieces">\</div>
-&#x20; \<button id="checkBtn" onclick="checkAnswer()">정답 확인\</button>
-&#x20; \<p id="result">\</p>
-\</div>
+<div id="game" hidden>
+  <h2 id="stage"></h2>
+  <p id="description"></p>
+  <p>완성 시간: <span id="timer">0.00</span>초</p>
+  <div id="pieces"></div>
+  <button id="checkBtn" onclick="checkAnswer()">정답 확인</button>
+  <p id="result"></p>
+</div>
 
-\<div id="study" hidden>
-&#x20; \<h2>학습 자료\</h2>
+<div id="study" hidden>
+  <h2>학습 자료</h2>
 
-&#x20; \<div class="info">
-&#x20;   \<b>체액성 면역\</b>
-&#x20;   \<p>B세포가 형질세포로 분화하고 형질세포가 항체를 생산한다. 항체는 항원에 결합하여 병원체를 중화하는 등 면역 작용을 돕는다.\</p>
-&#x20; \</div>
+  <div class="info">
+    <b>체액성 면역</b>
+    <p>B세포가 형질세포로 분화하고 형질세포가 항체를 생산한다. 항체는 항원에 결합하여 병원체를 중화하는 등 면역 작용을 돕는다.</p>
+  </div>
 
-&#x20; \<div class="info">
-&#x20;   \<b>세포성 면역\</b>
-&#x20;   \<p>세포독성 T세포가 감염된 세포를 인식하고 제거하는 면역 반응이다.\</p>
-&#x20; \</div>
+  <div class="info">
+    <b>세포성 면역</b>
+    <p>세포독성 T세포가 감염된 세포를 인식하고 제거하는 면역 반응이다.</p>
+  </div>
 
-&#x20; \<div class="info">
-&#x20;   \<b>주요 면역세포\</b>
-&#x20;   \<p>
-&#x20;   대식세포: 병원체 포식 및 항원 제시\<br>
-&#x20;   보조 T세포: 면역세포 활성화 도움\<br>
-&#x20;   B세포: 형질세포로 분화\<br>
-&#x20;   형질세포: 항체 생산\<br>
-&#x20;   기억세포: 재침입 시 빠른 면역 반응\<br>
-&#x20;   세포독성 T세포: 감염된 세포 제거
-&#x20;   \</p>
-&#x20; \</div>
+  <div class="info">
+    <b>주요 면역세포</b>
+    <p>
+    대식세포: 병원체 포식 및 항원 제시<br>
+    보조 T세포: 면역세포 활성화 도움<br>
+    B세포: 형질세포로 분화<br>
+    형질세포: 항체 생산<br>
+    기억세포: 재침입 시 빠른 면역 반응<br>
+    세포독성 T세포: 감염된 세포 제거
+    </p>
+  </div>
 
-\<button onclick="home()">돌아가기\</button>
+  <button onclick="home()">돌아가기</button>
+</div>
 
-\</div>
+<div id="end" hidden>
+  <h2>게임 결과</h2>
+  <p id="finalTime"></p>
+  <p id="bestResult"></p>
+  <button onclick="home()">메인으로</button>
+</div>
+</main>
 
-\<div id="end" hidden>   \<h2>게임 결과\</h2>   \<p id="finalTime">\</p>   \<p id="bestResult">\</p>   \<button onclick="home()">메인으로\</button> \</div> \</main>
+<script>
+const stages = [
+  {
+    title: "체액성 면역",
+    description: "체액성 면역의 진행 순서를 배열하세요.",
+    steps: [
+      "병원체 침입",
+      "대식세포의 항원 제시",
+      "보조 T세포 활성화",
+      "B세포 활성화",
+      "B세포의 형질세포 분화",
+      "형질세포의 항체 생산"
+    ],
+    explanation: "체액성 면역은 B세포가 형질세포로 분화하여 항체를 생산하는 면역 반응입니다."
+  },
+  {
+    title: "세포성 면역",
+    description: "세포성 면역의 진행 순서를 배열하세요.",
+    steps: [
+      "바이러스의 세포 감염",
+      "감염된 세포의 항원 제시",
+      "세포독성 T세포의 항원 인식",
+      "세포독성 T세포의 활성화",
+      "감염된 세포 제거"
+    ],
+    explanation: "세포성 면역은 세포독성 T세포가 감염된 세포를 인식하고 제거하는 면역 반응입니다."
+  }
+];
 
-\<script> const stages = [   {     title: "체액성 면역",     description: "체액성 면역의 진행 순서를 배열하세요.",     steps: [       "병원체 침입",       "대식세포의 항원 제시",       "보조 T세포 활성화",       "B세포 활성화",       "B세포의 형질세포 분화",       "형질세포의 항체 생산"     ],     explanation: "체액성 면역은 B세포가 형질세포로 분화하여 항체를 생산하는 면역 반응입니다."   },   {     title: "세포성 면역",     description: "세포성 면역의 진행 순서를 배열하세요.",     steps: [       "바이러스의 세포 감염",       "감염된 세포의 항원 제시",       "세포독성 T세포의 항원 인식",       "세포독성 T세포의 활성화",       "감염된 세포 제거"     ],     explanation: "세포성 면역은 세포독성 T세포가 감염된 세포를 인식하고 제거하는 면역 반응입니다."   } ];  let player = ""; let stageIndex = 0; let current = []; let startTime = 0; let timerInterval; let locked = false;  function hideAll() {   ["home", "game", "study", "end"].forEach(id => {     document.getElementById(id).hidden = true;   }); }  function home() {   clearInterval(timerInterval);   hideAll();   document.getElementById("home").hidden = false;   showBest(); }  function showBest() {   const best = localStorage.getItem("bestTime\_" + player);    document.getElementById("best").innerText =     player && best       ? "내 최고 기록: " + Number(best).toFixed(2) + "초"       : ""; }  function startGame() {   player = document.getElementById("name").value.trim();    if (!player) {     alert("이름을 입력하세요.");     return;   }    stageIndex = 0;   locked = false;    hideAll();   document.getElementById("game").hidden = false;    startTime = performance.now();    timerInterval = setInterval(() => {     const elapsed = (performance.now() - startTime) / 1000;     document.getElementById("timer").innerText = elapsed.toFixed(2);   }, 30);    loadStage(); }  function loadStage() {   locked = false;    const s = stages[stageIndex];    document.getElementById("stage").innerText =     "STAGE " + (stageIndex + 1) + ". " + s.title;    document.getElementById("description").innerText = s.description;   document.getElementById("result").innerText = "";   document.getElementById("checkBtn").disabled = false;    current = [...s.steps];    for (let i = current.length - 1; i > 0; i--) {     const j = Math.floor(Math.random() \* (i + 1));     [current[i], current[j]] = [current[j], current[i]];   }    if (current.every((v, i) => v === s.steps[i])) {     [current[0], current[1]] = [current[1], current[0]];   }    draw(); }  function draw() {   const area = document.getElementById("pieces");   area.innerHTML = "";    current.forEach((item, i) => {     const div = document.createElement("div");     div.className = "piece";      const span = document.createElement("span");     span.innerText = (i + 1) + ". " + item;      const controls = document.createElement("span");      const up = document.createElement("button");     up.innerText = "↑";     up.disabled = locked;     up.onclick = () => move(i, -1);      const down = document.createElement("button");     down.innerText = "↓";     down.disabled = locked;     down.onclick = () => move(i, 1);      controls.append(up, down);     div.append(span, controls);     area.appendChild(div);   }); }  function move(i, d) {   if (locked) return;    const j = i + d;   if (j < 0 || j >= current.length) return;    [current[i], current[j]] = [current[j], current[i]];   draw(); }  function checkAnswer() {   if (locked) return;    const correct = stages[stageIndex].steps;   const result = document.getElementById("result");    if (current.every((v, i) => v === correct[i])) {     locked = true;      document.getElementById("checkBtn").disabled = true;     draw();      result.innerText =       "정답입니다!\n" + stages[stageIndex].explanation;      setTimeout(() => {       stageIndex++;        if (stageIndex < stages.length) {         loadStage();       } else {         finish();       }     }, 2000);    } else {     result.innerText = "순서가 틀렸습니다. 다시 배열해 보세요.";   } }  function finish() {   clearInterval(timerInterval);    const elapsed = (performance.now() - startTime) / 1000;   const finalTime = elapsed.toFixed(2);    const bestKey = "bestTime\_" + player;   const oldBest = localStorage.getItem(bestKey);    let bestTime;    if (oldBest === null || elapsed < Number(oldBest)) {     localStorage.setItem(bestKey, finalTime);     bestTime = finalTime;   } else {     bestTime = oldBest;   }    hideAll();   document.getElementById("end").hidden = false;    document.getElementById("finalTime").innerText =     "완성 시간: " + finalTime + "초";    document.getElementById("bestResult").innerText =     "내 최고 기록: " + Number(bestTime).toFixed(2) + "초"; }  function study() {   hideAll();   document.getElementById("study").hidden = false; }  showBest(); \</script>
+let player = "";
+let stageIndex = 0;
+let current = [];
+let startTime = 0;
+let timerInterval;
+let locked = false;
 
-\</body> \</html>
+function hideAll() {
+  ["home", "game", "study", "end"].forEach(id => {
+    document.getElementById(id).hidden = true;
+  });
+}
+
+function home() {
+  clearInterval(timerInterval);
+  hideAll();
+  document.getElementById("home").hidden = false;
+  showBest();
+}
+
+function showBest() {
+  const name = document.getElementById("name").value.trim();
+  const best = localStorage.getItem("bestTime_" + name);
+
+  document.getElementById("best").innerText =
+    name && best
+      ? "내 최고 기록: " + Number(best).toFixed(2) + "초"
+      : "";
+}
+
+function startGame() {
+  player = document.getElementById("name").value.trim();
+
+  if (!player) {
+    alert("이름을 입력하세요.");
+    return;
+  }
+
+  stageIndex = 0;
+  locked = false;
+
+  hideAll();
+  document.getElementById("game").hidden = false;
+
+  startTime = performance.now();
+
+  timerInterval = setInterval(() => {
+    const elapsed = (performance.now() - startTime) / 1000;
+    document.getElementById("timer").innerText = elapsed.toFixed(2);
+  }, 30);
+
+  loadStage();
+}
+
+function loadStage() {
+  locked = false;
+
+  const s = stages[stageIndex];
+
+  document.getElementById("stage").innerText =
+    "STAGE " + (stageIndex + 1) + ". " + s.title;
+
+  document.getElementById("description").innerText = s.description;
+  document.getElementById("result").innerText = "";
+  document.getElementById("checkBtn").disabled = false;
+
+  current = [...s.steps];
+
+  for (let i = current.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [current[i], current[j]] = [current[j], current[i]];
+  }
+
+  if (current.every((v, i) => v === s.steps[i])) {
+    [current[0], current[1]] = [current[1], current[0]];
+  }
+
+  draw();
+}
+
+function draw() {
+  const area = document.getElementById("pieces");
+  area.innerHTML = "";
+
+  current.forEach((item, i) => {
+    const div = document.createElement("div");
+    div.className = "piece";
+
+    const span = document.createElement("span");
+    span.innerText = (i + 1) + ". " + item;
+
+    const controls = document.createElement("span");
+
+    const up = document.createElement("button");
+    up.innerText = "↑";
+    up.disabled = locked;
+    up.onclick = () => move(i, -1);
+
+    const down = document.createElement("button");
+    down.innerText = "↓";
+    down.disabled = locked;
+    down.onclick = () => move(i, 1);
+
+    controls.append(up, down);
+    div.append(span, controls);
+    area.appendChild(div);
+  });
+}
+
+function move(i, d) {
+  if (locked) return;
+
+  const j = i + d;
+  if (j < 0 || j >= current.length) return;
+
+  [current[i], current[j]] = [current[j], current[i]];
+  draw();
+}
+
+function checkAnswer() {
+  if (locked) return;
+
+  const correct = stages[stageIndex].steps;
+  const result = document.getElementById("result");
+
+  if (current.every((v, i) => v === correct[i])) {
+    locked = true;
+    document.getElementById("checkBtn").disabled = true;
+    draw();
+
+    result.innerText =
+      "정답입니다!\n" + stages[stageIndex].explanation;
+
+    setTimeout(() => {
+      stageIndex++;
+
+      if (stageIndex < stages.length) {
+        loadStage();
+      } else {
+        finish();
+      }
+    }, 2000);
+
+  } else {
+    result.innerText = "순서가 틀렸습니다. 다시 배열해 보세요.";
+  }
+}
+
+function finish() {
+  clearInterval(timerInterval);
+
+  const elapsed = (performance.now() - startTime) / 1000;
+  const finalTime = elapsed.toFixed(2);
+
+  const bestKey = "bestTime_" + player;
+  const oldBest = localStorage.getItem(bestKey);
+
+  let bestTime;
+
+  if (oldBest === null || elapsed < Number(oldBest)) {
+    localStorage.setItem(bestKey, finalTime);
+    bestTime = finalTime;
+  } else {
+    bestTime = oldBest;
+  }
+
+  hideAll();
+  document.getElementById("end").hidden = false;
+
+  document.getElementById("finalTime").innerText =
+    "완성 시간: " + finalTime + "초";
+
+  document.getElementById("bestResult").innerText =
+    "내 최고 기록: " + Number(bestTime).toFixed(2) + "초";
+}
+
+function study() {
+  hideAll();
+  document.getElementById("study").hidden = false;
+}
+</script>
+
+</body>
+</html>
